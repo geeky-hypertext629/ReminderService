@@ -4,8 +4,9 @@ const express = require('express');
 const {PORT} = require('./config/serverConfig');
 
 const {sendBasicEmail} = require('./services/email-service');
+const TicketController = require('./controllers/ticket-controller');
 
-const cron = require('node-cron');
+const jobs = require('./utils/job');
 
 
 
@@ -14,6 +15,8 @@ const setupAndStartServer = () =>{
     const app = express();
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({extended : true}));
+
+    app.post('/api/v1/tickets', TicketController.create)
 
     app.listen(PORT, ()=>{
         //Syntax for sending email
@@ -24,9 +27,7 @@ const setupAndStartServer = () =>{
         //     'Hey, how are you , I like you like support',
         // );
 
-        cron.schedule('*/2 * * * *', () => {
-            console.log('running a task every two minutes');
-          });
+      jobs();
         console.log(`Server started on PORT : ${PORT}`);
      
     })
